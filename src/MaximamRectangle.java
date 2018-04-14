@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * 85. Maximal Rectangle
@@ -12,7 +13,6 @@ import java.util.Arrays;
  * 1 0 0 1 0
  * Return 6.
  *
- * 】
  * height:
  * 1 0 1 0 0
  * 2 0 2 1 1
@@ -61,7 +61,7 @@ public class MaximamRectangle {
                     curLeft = j + 1;
                 }
             }
-            for(int j = n - 1; j > 0; j--){
+            for(int j = n - 1; j >= 0; j--){
                 if(matrix[i][j] == '1'){
                     right[j] = Math.min(right[j],curRight);
                 }else {
@@ -75,11 +75,43 @@ public class MaximamRectangle {
         }
         return res;
     }
+
+    public static int maximalRectangle2(char[][] matrix){
+        if(matrix.length == 0 || matrix == null)return 0;
+        int n = matrix[0].length;
+        int[] height = new int[n + 1];
+        height[n] = 0;
+        int res = 0;
+
+        for(int row = 0; row < matrix.length ; row++){
+            Stack<Integer>stack = new Stack<>();
+            for(int i = 0; i < n + 1; i++){
+                if(i < n){
+                    if(matrix[row][i] == '1')height[i]++;
+                    else height[i] = 0;
+                }
+                //System.out.println(Arrays.toString(height));
+
+                if(stack.isEmpty() || height[stack.peek()] <= height[i]){
+                    stack.push(i);
+                }else{
+                    while(!stack.isEmpty() && height[i] < height[stack.peek()]){
+                        int cur = height[stack.pop()] *
+                                (stack.isEmpty() ? i : (i - stack.peek() - 1));
+                        res = Math.max(cur, res);
+                    }
+                    stack.push(i);
+                }
+            }
+        }
+        return res;
+    }
     public static void main(String[]args){
         char[][]matrix = {{'1', '0', '1', '0', '0'},
                           {'1', '0', '1', '1', '1'},
                           {'1', '1', '1', '1', '1'},
                           {'1', '0', '0', '1', '0'}};
         System.out.println(maximalRectangle(matrix));
+        System.out.println(maximalRectangle2(matrix));
     }
 }
